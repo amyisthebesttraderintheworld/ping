@@ -7,6 +7,7 @@ const agentManager = require('./agentManager');
 const reputationService = require('./reputationService');
 
 const express = require('express');
+const path = require('path');
 
 class Daemon {
     constructor() {
@@ -16,8 +17,19 @@ class Daemon {
     }
 
     setupHealthCheck() {
+        // Serve static frontend files
+        const publicPath = path.join(__dirname, '..', 'public');
+        this.app.use(express.static(publicPath));
+
+        // API endpoints
         this.app.get('/health', (req, res) => res.status(200).send('OK'));
         this.app.get('/', (req, res) => res.json({ status: 'running', agentCount: Object.keys(agentManager.getAgent || {}).length }));
+        
+        // SPA fallback — serve index.html for all non-API routes
+        this.app.get('*', (req, res) => {
+            res.sendFile(path.join(publicPath, 'index.html'));
+        });
+        
         this.app.listen(this.port, () => log(`Health check server listening on port ${this.port}`));
     }
 
