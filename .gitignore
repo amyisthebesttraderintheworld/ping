@@ -1,0 +1,9 @@
+.env
+node_modules/
+build/
+data/
+abis.json
+deployed_addresses.json
+package-lock.json
+*.log
+.DS_Store
